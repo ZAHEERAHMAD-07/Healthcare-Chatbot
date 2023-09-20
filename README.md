@@ -13,7 +13,7 @@ accessibility to medical knowledge through medical chatbots
 Clone the project
 
 ```bash
-  gh repo clone YasinMakandar/Healthcare-Chatbot
+  gh repo clone ZAHEERAHMAD-07/Healthcare-Chatbot
 ```
 
 Go to the project directory
