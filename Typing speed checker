@@ -1,0 +1,142 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
+import javax.swing.border.Border;
+import javax.swing.BorderFactory;
+
+public class TypingGameGUI extends JFrame {
+    private JTextArea textArea;
+    private JTextField inputField;
+    private JButton startButton;
+    private JLabel resultLabel;
+   
+
+    private String[] words = {"Programmer A machine that turns coffee into code", "Computers are fast programmers keep it slow", "It is during our darkest moments that we must focus to see the light", "Life is a succession of lessons which must be lived to be understood","You must be the change you wish to see in the world","If life were predictable it would cease to be life and be without flavor"};
+    private String currentWord;
+    private long startTime;
+
+    public TypingGameGUI() {
+        setTitle("Typing Game");
+        setSize(800, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        Border south1Border = BorderFactory.createTitledBorder("Type:");
+
+        textArea = new JTextArea();
+        textArea.setEditable(false);
+        textArea.setBackground(Color.WHITE);
+        textArea.setPreferredSize(new Dimension(80, 20));
+        textArea.setFont(new Font("Arial", Font.PLAIN, 20));
+        textArea.setBorder(south1Border);
+        add(textArea, BorderLayout.CENTER);
+        
+       
+        
+        inputField = new JTextField();
+        inputField.setFont(new Font("Arial", Font.PLAIN, 20));
+        textArea.setPreferredSize(new Dimension(80, 40));
+        inputField.setBackground(new Color(173, 216, 230));
+        inputField.setBorder(south1Border);
+        add(inputField, BorderLayout.SOUTH);
+
+       
+
+        startButton = new JButton("Start Game or Restart the Game");
+        startButton.setFont(new Font("Headder", Font.TRUETYPE_FONT, 20));
+        add(startButton, BorderLayout.NORTH);
+
+        resultLabel = new JLabel();
+        add(resultLabel, BorderLayout.EAST);
+
+        startButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startGame();
+            }
+        });
+
+        inputField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                checkInput();
+            }
+        });
+    }
+
+    private void startGame() {
+        textArea.setText("");
+        resultLabel.setText("");
+        inputField.setEnabled(true);
+        startButton.setEnabled(false);
+
+        // Choose a random word
+        Random random = new Random();
+        currentWord = words[random.nextInt(words.length)];
+
+        // Display the word in the text area
+        textArea.append(currentWord);
+
+        // Record the start time
+        startTime = System.currentTimeMillis();
+    }
+
+    private void checkInput() {
+        String userInput = inputField.getText().trim();
+
+        // Calculate performance metrics
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        double accuracy = calculateAccuracy(currentWord, userInput);
+        int wordsPerMinute = calculateWordsPerMinute(userInput, elapsedTime);
+        int charactersPerMinute = calculateCharactersPerMinute(userInput, elapsedTime);
+
+        // Display performance metrics
+        resultLabel.setText("<html>Accuracy: " + accuracy + "%<br>Words Per Minute: " + wordsPerMinute +
+                " WPM<br>Characters Per Minute: " + charactersPerMinute + " CPM</html>");
+
+        // Provide suggestions based on performance
+        if (accuracy < 80) {
+            resultLabel.setText(resultLabel.getText() + "<br>Your accuracy is low. Focus on typing accurately.");
+        } else if (wordsPerMinute < 30) {
+            resultLabel.setText(resultLabel.getText() + "<br>You are typing a bit slowly. Try to increase your speed.");
+        } else {
+            resultLabel.setText(resultLabel.getText() + "<br>Great job! Your typing skills are impressive.");
+        }
+
+        // Reset the game
+        inputField.setText("");
+        inputField.setEnabled(false);
+        startButton.setEnabled(true);
+    }
+
+    private double calculateAccuracy(String original, String typed) {
+        int correctCharacters = 0;
+        int minLength = Math.min(original.length(), typed.length());
+
+        for (int i = 0; i < minLength; i++) {
+            if (original.charAt(i) == typed.charAt(i)) {
+                correctCharacters++;
+            }
+        }
+
+        return ((double) correctCharacters / original.length()) * 100;
+    }
+
+    private int calculateWordsPerMinute(String text, long elapsedTime) {
+        int words = text.split("\\s+").length;
+        return (int) ((words / ((double) elapsedTime / 1000)) * 60);
+    }
+
+    private int calculateCharactersPerMinute(String text, long elapsedTime) {
+        return (int) ((text.length() / ((double) elapsedTime / 1000)) * 60);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            TypingGameGUI typingGameGUI = new TypingGameGUI();
+            typingGameGUI.setVisible(true);
+        });
+    }
+}
